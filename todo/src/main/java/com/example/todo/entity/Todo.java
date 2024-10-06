@@ -1,5 +1,4 @@
 package com.example.todo.entity;
-
 import java.time.LocalDate;
 
 import lombok.Data;

@@ -19,15 +19,35 @@ public class TodoController {
 	
 	@GetMapping("/")
 	public String index(Model model) {
-		List<Todo> list = todoMapper.selectAll();
-		
+//		List<Todo> list = todoMapper.selectAll();
+	
+		// デバッグ用
+//		for (Todo todo : list) {
+//		    System.out.println("ID: " + todo.getId() + ", Title: " + todo.getTitle() + ", Done Flag: " + todo.getDone_flg() + ", Time Limit: " + todo.getTime_limit());
+//		}
+		List<Todo> list = todoMapper.selectIncomplete();
+		List<Todo> doneList = todoMapper.selectComplete();
+
 		model.addAttribute("todos", list);
+		model.addAttribute("doneTodos", doneList);
 		return "index";
 	}
 	
 	@PostMapping("/add")
 	public String add(Todo todo) {
 		todoMapper.add(todo);
+		return "redirect:/";
+	}
+	
+	@PostMapping("/update")
+	public String update(Todo todo) {
+		todoMapper.update(todo);
+		return "redirect:/";
+	}
+	
+	@PostMapping("/delete")
+	public String delete() {
+		todoMapper.delete();
 		return "redirect:/";
 	}
 	
