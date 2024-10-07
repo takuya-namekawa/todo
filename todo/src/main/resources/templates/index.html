@@ -1,41 +1,115 @@
 <!DOCTYPE html>
-<html  xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-<meta charset="UTF-8">
-<title>Todo</title>
+    <meta charset="UTF-8">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous"> 
+    <title>Todo</title>
 </head>
 <body>
-	<h1>Todo-List</h1>
-	<form method="post" th:action="@{/update}" th:each="todo : ${todos}">
-		<input type="hidden" name="done_flg" value="0" />
-		<input type="checkbox" name="done_flg" value="1" th:checked="${todo.done_flg == 1}" />
-		<input type="hidden" name="id" th:value="${todo.id}" />
-		<input type="text" name="title" th:value="${todo.title}" />
-		<input type="date" name="time_limit" th:value="${todo.time_limit}" />
-		<input type="submit" value="更新" />
-	</form>
-	
-	
-	<h3>完了済み</h3>
-	<form method="post" th:action="@{/update}" th:each="todo : ${doneTodos}">
-		<input type="checkbox" name="done_flg" value="1" />
-		<input type="hidden" name="id" th:value="${todo.id}" />
-		<input type="text" name="title" th:value="${todo.title}" style="text-decoration:line-through"/>
-		<input type="date" name="time_limit" th:value="${todo.time_limit}" />
-		<input type="submit" value="更新" />
-	</form>
-
-	
-	<h3>新しいタスクを追加</h3>
-	<form method="post" th:action="@{/add}">
-		<input type="text" name="title" />
-		<input type="date" name="time_limit" />
-		<input type="submit" value="追加" />	
-	</form>
-	
-	<form method="post" th:action="@{/delete}">
-		<input type="submit" value="完了済みを削除" />
-	</form>
-	
+    <div class="container mt-3">
+        <h1 class="text-center">ToDoList-タスク管理アプリ</h1>
+        <h3 class="text-center mb-5">本日の日付: <span th:text="${#temporals.format(today, 'yyyy年MM月dd日')}"></span></h3>
+        <div class="row">
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                       	<h3>タスク一覧</h3>
+                        
+                        <form method="post" th:action="@{/update}" th:each="todo : ${todos}">
+							<div class="row  mt-3">
+								
+								<div class="col-1">
+									<input type="checkbox" name="done_flg" value="1" th:checked="${todo.done_flg == 1}" class="form-check-input"/>
+		                            <input type="hidden" name="done_flg" value="0" th:if="${todo.done_flg == 0}" />
+								</div>
+								
+								<div class="col-5">	
+		                            <input type="hidden" name="id" th:value="${todo.id}" />
+		                            <input type="text" name="title" th:value="${todo.title}" class="form-control"/>
+								</div>
+							
+								<div class="col-5">
+									 <input type="date" name="time_limit" th:value="${todo.time_limit}" class="form-control"/>
+									 <span style="font-size: small; color: red;" th:text="'期限まで ' + ${todo.diffDays} + ' 日'"></span> 
+								</div>
+								
+								<div class="col-4 d-flex justify-content-center">
+									<input type="submit" value="完了" class="btn btn-success"/>
+								</div>
+								
+							</div>
+                            
+                            
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h3>完了済み</h3>
+                        <form method="post" th:action="@{/update}" th:each="todo : ${doneTodos}">
+							<div class="row mb-3">
+								
+								<div class="col-1">
+									 <input type="checkbox" name="done_flg" value="0" th:checked="${todo.done_flg == 0}" class="form-check-input"/>
+								</div>
+								
+								<div class="col-5">
+									<input type="hidden" name="id" th:value="${todo.id}" />
+                            		<input type="text" name="title" th:value="${todo.title}" style="text-decoration:line-through" class="form-control"/>
+								</div>
+								
+								<div class="col-5">
+									<input type="date" name="time_limit" th:value="${todo.time_limit}" class="form-control"/>
+								</div>
+								
+							</div>
+                            <input type="submit" value="未完了に戻す" class="btn btn-warning"/>
+                        </form>
+                        
+                        <form method="post" th:action="@{/delete}">
+                            <input type="submit" value="完了済みを削除" class="btn btn-danger mt-3"/>
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body">
+						<div th:if="${error != null}">
+	                        <p style="color:red;">
+	                            <span th:if="${error == 'emptyTitle'}">タスクのタイトルを入力してください！</span>
+	                            <span th:if="${error == 'pastDate'}">未来の日付を設定してください！</span>
+	                        </p>
+                        </div>
+                        <h3>新しいタスクを追加</h3>
+                        <form method="post" th:action="@{/add}">
+							<div class="row mb-3">
+								
+								<div class="col-7">
+									 <input type="text" name="title" placeholder="追加するタスクを入力" class="form-control"/>
+								</div>
+								
+								<div class="col-5">
+									<input type="date" name="time_limit" required th:value="${#dates.format(new java.util.Date(), 'yyyy-MM-dd')}" min="${#dates.format(new java.util.Date(), 'yyyy-MM-dd')}" class="form-control"/>
+								</div>
+								
+							</div>
+                            <input type="submit" value="追加" class="btn btn-info"/>	
+                        </form>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
 </body>
 </html>

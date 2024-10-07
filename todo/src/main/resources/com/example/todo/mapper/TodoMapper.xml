@@ -18,11 +18,11 @@
     </select>
     
     <select id="selectIncomplete" resultMap="todoResultMap">
-    	SELECT * FROM todo_items WHERE done_flg = 0
+    	SELECT * FROM todo_items WHERE done_flg = 0 ORDER BY time_limit ASC
     </select>
     
     <select id="selectComplete" resultMap="todoResultMap">
-    	SELECT * FROM todo_items WHERE done_flg = 1
+    	SELECT * FROM todo_items WHERE done_flg = 1 ORDER BY time_limit ASC
     </select>
 	
 	<insert id="add" parameterType="com.example.todo.entity.Todo">
